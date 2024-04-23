@@ -70,3 +70,36 @@ Route::get('posts/{id}', function ($id){
 Route::get('posts/{id?}/comments/{comments_id}', function ($id, $comments_id){
     return "Posts page: {$id}, Comments: {$comments_id}";
 })->where(['id' => '[\d]+', 'comments_id' => '[\d]+']);
+
+
+/**
+ * Тут нижче, ми також вкажемо виключення, для обробки даних, які будуть відправлені методом POST
+ * В попередньому прикладі, ми виклчюення встановлювали через файл app/Http/Middleware/VerifyCsrfToken
+ */
+//Route::post('/posts', function (){
+//    return 'Post data';
+//})->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class);
+
+/**
+ * Уявимо ситуацію, що наша сторінка, може як отримувати дані (GET), так їх і відправляти (POST)
+ * Тому тут ми можемо використати статичний метод Route::match - куди передати методи, якими будемо обробляти сторінку
+ */
+
+Route::match(['get', 'post'], '/posts', function (){
+    return "Send POST data";
+})->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class);
+
+/**
+ * А якщо нам потрібно, щоб сторінка були всі методи, то можемо використати статичний метод Route::any
+ */
+
+Route::any( '/posts', function (){
+    return "Send POST data";
+})->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class);
+
+/**
+ * На випадоку, якщо нам потрібно зробити редірект на іншу сторінку, для цього також є статичний метод
+ *
+ */
+
+Route::redirect('/here', '/posts', 301);
