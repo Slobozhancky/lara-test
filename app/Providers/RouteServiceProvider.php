@@ -24,6 +24,18 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+
+        /**
+         * У файлі routes/web.php ми локально, кожному роутеру, можемо указувати перевірки, для опціональних
+         * параметрів маршрутів. Але у випадку з файлом RouteServiceProvider, ми можемо задати налаштування глобально
+         * . за допомогою відповідного статичного методу Route::pattern
+         *
+         * Та у випадку якщо у файлі routes/web.php, перевірок не буде, то ми все одно, будемо мати ці перевірки для
+         * опцій на глобальному рівні
+         */
+        Route::pattern('id', '[\d]+');
+        Route::pattern('comments_id', '[\d]+');
+
         RateLimiter::for('api', function (Request $request) {
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
