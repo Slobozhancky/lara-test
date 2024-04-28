@@ -23,10 +23,15 @@ use Illuminate\Http\Request;
 class TestController extends Controller
 {
     /**
-     * Handle the incoming request.
+     * Нижче зображено приклад функції compact, яка дозволить помістити звичайні змінні в масив, де назва змінної
+     * буде ключем, за яким ми зможемо звернутись до цієї змінної
      */
     public function __invoke(Request $request)
     {
-        return 'Test controller';
+        $title = 'Test page';
+        $name = 'Bob';
+        $age = 20;
+
+        return view('home.test', compact('title', 'name', 'age'));
     }
 }
