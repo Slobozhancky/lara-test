@@ -1,105 +1,95 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\PostController;
+use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Home;
+use App\Http\Controllers\TestController;
+use App\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
+Route::get('/', [Home::class, 'index']);
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/test', TestController::class);
+
+Route::prefix('admin')->group(function (){
+    Route::get('/', [AdminController::class, 'index']);
+
+    /**
+     *
+     * Цей запис означає, що ви визначаєте маршрут GET для шляху "/products", який буде обробляти клас контролера
+     * ProductController з методом index.
+     *
+     * Але особливість в тому, що ви також присвоюєте ім'я цьому маршруту за допомогою методу name. У цьому випадку
+     * маршрут отримує ім'я "admin.products.index". Це дозволяє вам легко посилатися на цей маршрут в інших частинах
+     * вашого додатку за допомогою допоміжних функцій, таких як route() або redirect()->route().
+     *
+     * Наприклад, якщо вам потрібно створити посилання на цей маршрут у вашому шаблоні, ви можете використати такий код:
+     *
+     * <a href="{{ route('admin.products.index') }}">Список продуктів</a>
+     */
+
+    Route::get("/products", [ProductController::class, 'index'])->name('admin.products.index');
+
+    Route::get("/products/create", [ProductController::class, 'create'])->name('admin.products.create');
+
+    /**
+     * За цим посиланням - https://laravel.com/docs/10.x/controllers#actions-handled-by-resource-controllers, можна
+     * перейти на сторінку, де буде вказано як слід за конвенцією, прописувати методи, для відповідних роутів
+     */
+
+    Route::post("/products", [ProductController::class, 'store'])->name('admin.products.store')
+        ->withoutMiddleware(VerifyCsrfToken::class);
+
+    Route::get("/products/{product}", [ProductController::class, 'show'])->name("admin.products.show");
+
+    Route::get("/products/{product}/edit", [ProductController::class, 'edit'])->name("admin.products.edit");
+
+    /**
+     * Тут потрібно бути уважним, бо на сторінці: https://laravel.com/docs/10.x/controllers#actions-handled-by-resource-controllers
+     * Ми маємо інформацію, що оновлення сутностей відбувається методом put/patch, але слід звернути увагу, що метод
+     * put/patch слід вказувати лише для Route, а вже сам метод який повинен спрацювати, це метод update, який ми
+     * пропишемо в відповідному контролері
+     *
+     */
+
+    Route::put("/products/{product}", [ProductController::class, 'update'])->name("admin.products.update")
+        ->withoutMiddleware(VerifyCsrfToken::class);
+
+    Route::delete("/products/{product}", [ProductController::class, 'destroy'])->name("admin.products.destroy")
+        ->withoutMiddleware(VerifyCsrfToken::class);
+
+    /**
+     * Метод Route::resource у Laravel дозволяє вам швидко та зручно визначити сукупність стандартних маршрутів для
+     * ресурсу (наприклад, моделі Eloquent) в вашому додатку. Це дозволяє вам легко робити CRUD
+     * (створення, читання, оновлення, видалення) операції з даними, а також додавати інші додаткові маршрути, які вам потрібні.
+     *
+     * Ось кілька переваг використання методу Route::resource:
+     *
+     * Зменшення коду: Замість того, щоб визначати кожен маршрут окремо, ви можете використати лише один метод для
+     * визначення всіх стандартних маршрутів для ресурсу. Це значно скорочує кількість коду, який вам потрібно писати.
+     * Конвенція над конфігурацією: Laravel використовує конвенції для визначення URL-шляхів та методів контролерів,
+     * що спрощує розробку. Наприклад, для відображення форми редагування запису, Laravel використовує маршрут з методом
+     * GET на URL-шляху /{resource}/{id}/edit, що робить код більш прогнозованим.
+     * Підтримка RESTful API: Використання методу Route::resource дозволяє легко визначати RESTful API для вашого додатку.
+     * Laravel надає стандартні шаблони маршрутів, які відповідають стандартам REST.
+     * Можливість налаштування: Хоча метод Route::resource визначає стандартні маршрути для ресурсу, ви все ще можете
+     * налаштувати ці маршрути або додавати до них додаткові маршрути, які вам потрібні.
+     *
+     * ПС: Якщо нам потрібно побачити всі маршрути, слід скористоуватись командою php artisan route:list
+     */
+    Route::resource('post', PostController::class);
+
+    /**
+     * Також ми можемо використати такі методи як only, та except
+     * Ці два методи, кажуть нам про те, що only - вкаже наті які марштури потрібно використовувати
+     * А except - виключення, тобто всі окрім тих які вкажемо в except
+     */
+
+    Route::resource('post', PostController::class)->only(['index', 'show']);
+
+    Route::resource('post', PostController::class)->except(['update']);
+
+
 });
 
-/**
-* Route::view: Цей метод використовується для визначення маршруту, який просто відображає певний представлення (шаблон) без необхідності в контролері.
- * Він використовується тоді, коли сторінка має статичний вміст та не потребує обробки в контролері
- */
-Route::get('/test', function (){
-   return view('new-test', ["title" => 'new-test page']);
-});
-
-/**
-* Route::get - Цей метод використовується для визначення маршруту, який працює зі звичайними HTTP запитами типу GET.
- * Він зазвичай використовується для визначення маршрутів, які потребують обробки відповіді через контролер
- */
-Route::view('/hello', 'hello', ['hello' => 'Hello world!!!']);
-
-/**
- * приклад нижче, вкаже нам на те, що ми можемо динамічно отримувати пости, з їх ID
-*/
-
-//Route::get('posts/{id}', function ($id){
-//    return "Post page: {$id}";
-//});
-
-/**
- * Також можна використовувати опціональні URL марштрути
- * {id?}: Параметр, який може бути опціональним (параметр за замовчуванням - 2).
- * {comments_id}: Обов'язковий параметр, що вказує на ідентифікатор коментаря.
- */
-
-//Route::get('posts/{id?}/comments/{comments_id}', function ($id = 2, $comments_id){
-//    return "Posts page: {$id}, Comments: {$comments_id}";
-//});
-
-/**
- * Також є доречним, використовувати перевірку, на випадок, якщо ми маємо оцікувати значення, певного дипуданих
- * Тобто,Ю якщо нам потрібно, щоб ID поста був строго числовий (а не те що ми можемо передавати строку), то нам слід
- * використати відповідну перевірку, що як ми отримаємо НЕ число, то нас відправило на 404 сторінку
- *
- * Також, якщо ми маємо опціональні записи, ми можемо вказувати параметрів в регулярному виразі, скільки нам потрібно
- *
- * Нижче приклад, якщо ми маємо отримувати Пости, тільки у випадку якщо параметри число
- */
-
-Route::get('posts/{id}', function ($id){
-    return "Post page: {$id}";
-})->where(['id' => '[\d]+']);
-
-/**
- * А тут, якщо і posts число, та comments також число
- */
-
-Route::get('posts/{id?}/comments/{comments_id}', function ($id, $comments_id){
-    return "Posts page: {$id}, Comments: {$comments_id}";
-})->where(['id' => '[\d]+', 'comments_id' => '[\d]+']);
-
-
-/**
- * Тут нижче, ми також вкажемо виключення, для обробки даних, які будуть відправлені методом POST
- * В попередньому прикладі, ми виклчюення встановлювали через файл app/Http/Middleware/VerifyCsrfToken
- */
-//Route::post('/posts', function (){
-//    return 'Post data';
-//})->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class);
-
-/**
- * Уявимо ситуацію, що наша сторінка, може як отримувати дані (GET), так їх і відправляти (POST)
- * Тому тут ми можемо використати статичний метод Route::match - куди передати методи, якими будемо обробляти сторінку
- */
-
-Route::match(['get', 'post'], '/posts', function (){
-    return "Send POST data";
-})->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class);
-
-/**
- * А якщо нам потрібно, щоб сторінка були всі методи, то можемо використати статичний метод Route::any
- */
-
-Route::any( '/posts', function (){
-    return "Send POST data";
-})->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class);
-
-/**
- * На випадоку, якщо нам потрібно зробити редірект на іншу сторінку, для цього також є статичний метод
- *
- */
-
-Route::redirect('/here', '/posts', 301);
