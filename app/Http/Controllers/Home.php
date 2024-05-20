@@ -1,9 +1,11 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Support\Facades\View;
 
-class Home extends Controller {
+class Home extends Controller
+{
 
     /**
      * Синтаксис:
@@ -20,14 +22,14 @@ class Home extends Controller {
      * класу при кожному виклику.
      */
 
-    public function index() : \Illuminate\Contracts\View\View
+    public function index(): \Illuminate\Contracts\View\View
     {
-//        return view('home.home', ['home' => 'Home page']);
-
-        return View::make('home.home',['title' => 'Home page'] );
+        //        return view('home.home', ['home' => 'Home page']);
+        return View::make('home.home', ['title' => 'Home page']);
     }
 
-    public function contacts(){
+    public function contacts()
+    {
         return View::make('home.contacts', ['title' => 'Contacts page']);
     }
 }

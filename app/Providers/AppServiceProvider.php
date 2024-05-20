@@ -16,16 +16,19 @@ class AppServiceProvider extends ServiceProvider
         //
     }
 
-/** View::share - це метод Laravel, який дозволяє вам передавати дані до всіх представлень (views) у вашому додатку.
- * Ви можете використовувати View::share для передачі глобальних даних, які повинні бути доступні у всіх представленнях
- * без необхідності передачі їх у кожен контролер.*/
+
     public function boot(): void
     {
+
+
+        /** View::share - це метод Laravel, який дозволяє вам передавати дані до всіх представлень (views) у вашому додатку.
+         * Ви можете використовувати View::share для передачі глобальних даних, які повинні бути доступні у всіх представленнях
+         * без необхідності передачі їх у кожен контролер.*/
 
         View::share('site_title', 'LARA_TEST');
 
         /**
-        * Далі в параметрі views, методу composer ми можемо передати дані, таким чином, щоб вказати для якого саме
+         * Далі в параметрі views, методу composer ми можемо передати дані, таким чином, щоб вказати для якого саме
          * виду, ми бумо шерити дані, тобто, це можу бути один вид у файлі resources/views, або можемо передати дані
          * масивом, якщо таких видів буде декілька
          */
@@ -40,11 +43,11 @@ class AppServiceProvider extends ServiceProvider
          * Нижче представлені два приклади, як просто прокинути дані до певного виду, у нашому випадку, прокинемо
          * дані до однієї сторінки Home
          */
-        view()->composer('home.home', function (\Illuminate\View\View $view){
+        view()->composer('home.home', function (\Illuminate\View\View $view) {
             $view->with('test1', "TEST 1");
         });
 
-        view()->composer('home.home', function (\Illuminate\View\View $view){
+        view()->composer('home.home', function (\Illuminate\View\View $view) {
             $view->with('test2', "TEST 2");
         });
 
@@ -53,11 +56,12 @@ class AppServiceProvider extends ServiceProvider
          * То ми це можемо зробити наступним чином - components.*
          */
 
-        view()->composer('components.*', function (\Illuminate\View\View $view){
+        view()->composer('components.*', function (\Illuminate\View\View $view) {
             $view->with('data', ['test1', 'test2', 'test3']);
         });
 
-        view()->composer('components.header', function (\Illuminate\View\View $view){
+        // Змінна $menu буде доступна в шаблоні Blade header, а у нашому випадку, виведеимо її в зтегові nav
+        view()->composer('components.header', function (\Illuminate\View\View $view) {
 
             $menu = '<ul>';
             $menu .= '<li><a href="' . route('home.home') . '">Home</a></li>';
