@@ -1,5 +1,5 @@
 <footer class="text-center ">
-    {{ date('d.m.Y') }} Slobozhancky <strong>{{ $count }}</strong>
+    {{ date('d.m.Y') }} - Slobozhancky
 </footer>
 
 </div>

@@ -12,27 +12,14 @@
 
     {{-- $site_title - це змінна яка прийшла до нас з файлу AppServeiceProvider --}}
     {{-- $title - приходить до нас з відповідного контролера, з файлу app/http/Home.php --}}
-    <title>{{ $site_title }} :: {{ $title }}</title>
+    <title>{{ $title }}</title>
 </head>
 
 <body>
 
-    <div class="container">
+    <div class="container d-flex flex-column ">
         <header class="d-flex justify-content-between mb-3">
             <img src="https://upload.wikimedia.org/wikipedia/commons/9/9a/Laravel.svg" alt="logo">
+
             @include('components.nav')
-
-            {{--Це приклад альтернативного способу, вивести меню, з файлу AppServiceProvider--}}
-            {{--Також синтаксис, який ми бачимо, він допомагає прибрати екранування HTML символів--}}
-            <!-- {!! $menu !!} -->
         </header>
-
-        <!-- А тут дані у змінну $data, приходять нам з файлу AppServiceProvider, у вигляді масиву -->
-        @foreach($data as $item)
-
-            <p>{{ $item }}</p>
-
-        @endforeach
-
-
-

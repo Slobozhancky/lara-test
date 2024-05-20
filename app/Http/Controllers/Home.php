@@ -30,6 +30,12 @@ class Home extends Controller
 
     public function contacts()
     {
-        return View::make('home.contacts', ['title' => 'Contacts page']);
+        // Тут буде приклад того, як ми передаємо JSON зі змінної $data, на сторінку contacts
+        $data = [
+            "name" => "Bob",
+            "age" => 30
+        ];
+
+        return View::make('home.contacts', ['title' => 'Contacts page', 'data' => $data]);
     }
 }
